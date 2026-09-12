@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHeader } from "@/components/mamina/PageHeader";
 import { Reveal } from "@/components/mamina/Reveal";
-import { Check, ArrowRight, Sparkles } from "lucide-react";
+import { Check, ArrowRight } from "lucide-react";
 
 import vip from "@/assets/zone-vip.jpg";
 import bar from "@/assets/zone-bar.jpg";
@@ -86,33 +86,6 @@ const ZONES_DETAILED = [
       "Privacidad absoluta con aislamiento acústico",
       "Pantalla oculta 4K para presentaciones privadas",
     ],
-  },
-];
-
-const COMPARISON_ROWS = [
-  { feature: "Anfitrión dedicado en mesa", vip: true, barra: false, terraza: true, cava: true },
-  {
-    feature: "Ritual de Bengala en botellería",
-    vip: true,
-    barra: false,
-    terraza: true,
-    cava: true,
-  },
-  { feature: "Acceso Preferencial sin fila", vip: true, barra: false, terraza: true, cava: true },
-  { feature: "Servicio de Shisha de Autor", vip: false, barra: false, terraza: true, cava: false },
-  {
-    feature: "Menú degustación maridado privado",
-    vip: false,
-    barra: true,
-    terraza: false,
-    cava: true,
-  },
-  {
-    feature: "Aislamiento acústico independiente",
-    vip: false,
-    barra: false,
-    terraza: false,
-    cava: true,
   },
 ];
 
@@ -220,70 +193,6 @@ function ExperienciasPage() {
               </Reveal>
             );
           })}
-        </div>
-
-        {/* Comparison Matrix */}
-        <div className="mt-32">
-          <Reveal>
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-2 text-[#C9A86A]">
-                <Sparkles className="h-3.5 w-3.5" strokeWidth={1.5} />
-                <span className="eyebrow">Comparativa Editorial</span>
-              </div>
-              <h2 className="mt-3 text-white text-3xl sm:text-4xl font-display">
-                Servicios por Territorio
-              </h2>
-            </div>
-          </Reveal>
-
-          <div className="mt-12 overflow-x-auto rounded-[1px] border border-[#C9A86A]/20 bg-[#121212] backdrop-blur-xl">
-            <table className="w-full text-left text-xs text-[#D1D1CB]">
-              <thead className="border-b border-[#C9A86A]/20 bg-[#080808]/90 font-display text-sm uppercase tracking-wider text-white">
-                <tr>
-                  <th className="p-5 font-semibold text-[#C9A86A]">Servicio / Atributo</th>
-                  <th className="p-5 text-center font-normal">Mesa VIP Alabastro</th>
-                  <th className="p-5 text-center font-normal">Barra de Filigrana</th>
-                  <th className="p-5 text-center font-normal">Terraza Sky</th>
-                  <th className="p-5 text-center font-semibold text-[#E5C378]">Cava Privada</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#C9A86A]/10">
-                {COMPARISON_ROWS.map((row, i) => (
-                  <tr key={i} className="hover:bg-[#C9A86A]/5 transition-colors">
-                    <td className="p-5 font-medium text-white">{row.feature}</td>
-                    <td className="p-5 text-center">
-                      {row.vip ? (
-                        <Check className="mx-auto h-4 w-4 text-[#C9A86A]" strokeWidth={2} />
-                      ) : (
-                        <span className="text-[#7A7A75]">—</span>
-                      )}
-                    </td>
-                    <td className="p-5 text-center">
-                      {row.barra ? (
-                        <Check className="mx-auto h-4 w-4 text-[#C9A86A]" strokeWidth={2} />
-                      ) : (
-                        <span className="text-[#7A7A75]">—</span>
-                      )}
-                    </td>
-                    <td className="p-5 text-center">
-                      {row.terraza ? (
-                        <Check className="mx-auto h-4 w-4 text-[#C9A86A]" strokeWidth={2} />
-                      ) : (
-                        <span className="text-[#7A7A75]">—</span>
-                      )}
-                    </td>
-                    <td className="p-5 text-center">
-                      {row.cava ? (
-                        <Check className="mx-auto h-4 w-4 text-[#E5C378]" strokeWidth={2} />
-                      ) : (
-                        <span className="text-[#7A7A75]">—</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
         </div>
 
         {/* Private Event Full-Hire Banner */}

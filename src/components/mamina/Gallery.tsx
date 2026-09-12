@@ -1,20 +1,14 @@
 import { Link } from "@tanstack/react-router";
-import { Reveal } from "./Reveal";
 import { ArrowRight } from "lucide-react";
-import v1 from "@/assets/vibe-1.jpg";
-import v2 from "@/assets/vibe-2.jpg";
-import v3 from "@/assets/vibe-3.jpg";
-import v4 from "@/assets/vibe-4.jpg";
-import v5 from "@/assets/vibe-5.jpg";
-import v6 from "@/assets/vibe-6.jpg";
+import { Reveal } from "./Reveal";
+import mix1 from "@/assets/mix-1.jpg";
+import mix2 from "@/assets/mix-2.jpg";
+import mix3 from "@/assets/mix-3.jpg";
 
-const shots = [
-  { src: v1, alt: "Techo de listones con luz cálida en el salón" },
-  { src: v2, alt: "Manos decorando un cóctel con pinzas" },
-  { src: v3, alt: "Mesa montada con velas y cristalería" },
-  { src: v4, alt: "Lámparas colgantes doradas sobre la barra" },
-  { src: v5, alt: "Brindis con copas de champagne en el lounge" },
-  { src: v6, alt: "Humo y luz dorada en la oscuridad" },
+const drinks = [
+  { src: mix1, alt: "Cóctel Huamanga Velvet de inspiración andina" },
+  { src: mix2, alt: "Cóctel Cacao VRAEM ahumado" },
+  { src: mix3, alt: "Cóctel Oro de Huamanga con lámina de oro" },
 ];
 
 export function Gallery() {
@@ -43,22 +37,27 @@ export function Gallery() {
           </Reveal>
         </div>
 
-        <div className="mt-16 columns-1 gap-6 sm:columns-2 lg:columns-3 [&>*]:mb-6">
-          {shots.map((s, i) => (
-            <Reveal key={s.alt} delay={(i % 3) * 120}>
-              <Link
-                to="/galeria"
-                className="luxury-card group block overflow-hidden rounded-[2px] border border-[#C9A86A]/12"
-              >
-                <img
-                  src={s.src}
-                  alt={s.alt}
-                  loading="lazy"
-                  className="w-full object-cover brightness-90 transition-all duration-[1200ms] ease-out group-hover:scale-[1.05] group-hover:brightness-110"
-                />
-              </Link>
-            </Reveal>
-          ))}
+        <div className="mt-16 overflow-hidden" aria-label="Galería de tragos y cortos">
+          <div className="drinks-marquee flex w-max">
+            {[0, 1].map((group) => (
+              <div key={group} className="drinks-marquee-group flex shrink-0 gap-6 pr-6">
+                {drinks.map((drink) => (
+                  <Link
+                    key={`${group}-${drink.alt}`}
+                    to="/galeria"
+                    className="luxury-card group block w-[min(78vw,360px)] shrink-0 overflow-hidden rounded-[2px] border border-[#C9A86A]/12"
+                  >
+                    <img
+                      src={drink.src}
+                      alt={drink.alt}
+                      loading="lazy"
+                      className="aspect-[4/5] w-full object-cover brightness-90 transition-all duration-[1200ms] ease-out group-hover:scale-[1.05] group-hover:brightness-110"
+                    />
+                  </Link>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

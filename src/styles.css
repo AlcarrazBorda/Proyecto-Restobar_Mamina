@@ -133,6 +133,24 @@
   }
 }
 
+@keyframes drinks-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.drinks-marquee {
+  animation: drinks-marquee 24s linear infinite;
+}
+
+.drinks-marquee:hover {
+  animation-play-state: paused;
+}
+
 /* ==========================================================================
    BOTONERÍA EDITORIAL DE ALTO NIVEL (HAUTE NOCTURNE)
    ========================================================================== */

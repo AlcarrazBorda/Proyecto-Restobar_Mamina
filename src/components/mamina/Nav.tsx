@@ -1,21 +1,17 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Volume2, VolumeX, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 const links = [
   { to: "/", label: "Inicio" },
   { to: "/carta", label: "La Carta" },
   { to: "/experiencias", label: "Experiencias VIP" },
-  { to: "/agenda", label: "Agenda" },
-  { to: "/el-concepto", label: "El Concepto" },
   { to: "/galeria", label: "The Vibe" },
 ];
 
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [playing, setPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
 
@@ -30,21 +26,6 @@ export function Nav() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  const toggleAudio = () => {
-    const el = audioRef.current;
-    if (!el) return;
-    if (playing) {
-      el.pause();
-      setPlaying(false);
-    } else {
-      el.volume = 0.25;
-      void el.play().then(
-        () => setPlaying(true),
-        () => setPlaying(false),
-      );
-    }
-  };
 
   return (
     <>
@@ -68,7 +49,7 @@ export function Nav() {
           </Link>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden items-center gap-8 lg:flex">
+          <div className="ml-auto hidden items-center gap-8 lg:flex">
             {links.map((l) => {
               const isActive = currentPath === l.to;
               return (
@@ -88,42 +69,8 @@ export function Nav() {
             })}
           </div>
 
-          {/* Actions: Audio Equalizer Button and VIP Booking CTA */}
-          <div className="flex items-center gap-3.5">
-            {/* Ambient Sound Equalizer Toggle */}
-            <button
-              type="button"
-              onClick={toggleAudio}
-              title={playing ? "Silenciar ambiente sonoro" : "Activar ambiente sonoro"}
-              aria-label={playing ? "Silenciar ambiente sonoro" : "Activar ambiente sonoro"}
-              className={`flex items-center gap-2 px-3 h-8 rounded-[1px] border transition-all duration-300 cursor-pointer ${
-                playing
-                  ? "border-[#C9A86A] bg-[#C9A86A]/10 text-[#E5C378]"
-                  : "border-white/15 text-[#CECBC4]/60 hover:border-[#C9A86A]/50 hover:text-white"
-              }`}
-            >
-              {playing ? (
-                <>
-                  <div className="flex items-end gap-0.5 h-3">
-                    <span className="w-0.5 bg-[#E5C378] animate-[bounce_1s_infinite_100ms] h-full" />
-                    <span className="w-0.5 bg-[#E5C378] animate-[bounce_1.2s_infinite_300ms] h-2/3" />
-                    <span className="w-0.5 bg-[#E5C378] animate-[bounce_0.8s_infinite_200ms] h-4/5" />
-                  </div>
-                  <span className="text-[9px] tracking-[0.2em] uppercase font-semibold hidden sm:inline">
-                    Sound ON
-                  </span>
-                </>
-              ) : (
-                <>
-                  <VolumeX className="h-3.5 w-3.5" strokeWidth={1.5} />
-                  <span className="text-[9px] tracking-[0.2em] uppercase hidden sm:inline">
-                    Sound
-                  </span>
-                </>
-              )}
-            </button>
-
-            {/* Refined Header Action */}
+          {/* VIP Booking CTA and Mobile Menu */}
+          <div className="ml-8 flex items-center gap-3.5">
             <Link to="/reservas" className="btn-header hidden md:inline-flex">
               Reservar Mesa
             </Link>
@@ -143,7 +90,6 @@ export function Nav() {
             </button>
           </div>
         </nav>
-        <audio ref={audioRef} loop preload="none" src="/audio/lounge.mp3" />
       </header>
 
       {/* Mobile Menu Glass Drawer */}

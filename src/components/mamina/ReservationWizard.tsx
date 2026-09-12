@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearch } from "@tanstack/react-router";
 import {
   Calendar,
@@ -90,6 +90,43 @@ const SHIFTS = [
   },
 ];
 
+const TIME_SLOTS = Array.from({ length: 19 }, (_, index) => {
+  const totalMinutes = 18 * 60 + index * 30;
+  const hours = Math.floor((totalMinutes % (24 * 60)) / 60);
+  const minutes = totalMinutes % 60;
+  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+});
+
+const WEEKDAY_FORMATTER = new Intl.DateTimeFormat("es-PE", { weekday: "short" });
+const DAY_FORMATTER = new Intl.DateTimeFormat("es-PE", { day: "numeric" });
+const MONTH_FORMATTER = new Intl.DateTimeFormat("es-PE", { month: "short" });
+
+function parseDate(value: string) {
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
+function formatDateValue(value: Date) {
+  const year = value.getFullYear();
+  const month = String(value.getMonth() + 1).padStart(2, "0");
+  const day = String(value.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function getWeekDates(value: string) {
+  const selectedDate = parseDate(value);
+  const dayOfWeek = selectedDate.getDay();
+  const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+  const monday = new Date(selectedDate);
+  monday.setDate(selectedDate.getDate() + mondayOffset);
+
+  return Array.from({ length: 7 }, (_, index) => {
+    const dateValue = new Date(monday);
+    dateValue.setDate(monday.getDate() + index);
+    return dateValue;
+  });
+}
+
 const OCCASIONS = [
   "Noche de Amigos y Cócteles",
   "Celebración de Cumpleaños (Ritual de bengala)",
@@ -122,7 +159,7 @@ export function ReservationWizard() {
     zone?: string;
   };
 
-  const [shift, setShift] = useState("nightclub");
+  const dateInputRef = useRef<HTMLInputElement>(null);
   const [date, setDate] = useState(() => {
     if (search.date) return search.date;
     const today = new Date();
@@ -149,7 +186,8 @@ export function ReservationWizard() {
   }, [search]);
 
   const currentZone = ZONES.find((z) => z.id === selectedZone) || ZONES[0];
-  const currentShift = SHIFTS.find((s) => s.id === shift) || SHIFTS[0];
+  const currentShift = time >= "22:30" ? SHIFTS[1] : SHIFTS[0];
+  const weekDates = getWeekDates(date);
 
   const handleBookingSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -329,99 +367,94 @@ export function ReservationWizard() {
     <form onSubmit={handleBookingSubmit} className="grid gap-12 lg:grid-cols-12">
       {/* Form Steps */}
       <div className="space-y-10 lg:col-span-7">
-        {/* Shift selector */}
+        {/* Date, Time and Guests */}
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <span className="flex h-6 w-6 items-center justify-center rounded-[2px] border border-[#C9A86A]/40 text-xs font-semibold text-[#C9A86A]">
               1
             </span>
             <h3 className="text-sm tracking-[0.2em] text-white uppercase font-semibold">
-              Selecciona el Turno
+              Elige tu fecha y horario
             </h3>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {SHIFTS.map((s) => (
-              <button
-                key={s.id}
-                type="button"
-                onClick={() => setShift(s.id)}
-                className={`group rounded-[2px] border p-5 text-left transition-all duration-300 cursor-pointer ${
-                  shift === s.id
-                    ? "border-[#C9A86A] bg-[#C9A86A]/10 shadow-[var(--shadow-glow)]"
-                    : "border-[#C9A86A]/15 bg-[#121212] hover:border-[#C9A86A]/40"
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-display text-lg text-white">{s.name}</span>
-                  {shift === s.id && (
-                    <CheckCircle2 className="h-4 w-4 text-[#C9A86A]" strokeWidth={1.5} />
-                  )}
-                </div>
-                <div className="mt-2 flex items-center gap-2 text-xs text-[#C9A86A]">
-                  <Clock className="h-3.5 w-3.5" strokeWidth={1.5} />
-                  <span>{s.hours}</span>
-                </div>
-                <p className="mt-2 text-xs leading-[1.6] text-[#7A7A75]">{s.desc}</p>
-              </button>
-            ))}
+          <div className="relative flex items-center justify-between rounded-[2px] border border-[#C9A86A]/20 bg-[#121212] p-4">
+            <div>
+              <span className="eyebrow text-[#C9A86A]">Semana disponible</span>
+              <p className="mt-1 text-sm text-white">
+                {MONTH_FORMATTER.format(parseDate(date))} {parseDate(date).getFullYear()}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => dateInputRef.current?.showPicker()}
+              className="btn-secondary relative z-10 px-4 py-2 text-xs"
+            >
+              <Calendar className="h-3.5 w-3.5" strokeWidth={1.5} />
+              <span>Elegir otra fecha</span>
+            </button>
+            <input
+              ref={dateInputRef}
+              type="date"
+              value={date}
+              min={formatDateValue(new Date())}
+              required
+              aria-label="Seleccionar otra fecha"
+              onChange={(e) => setDate(e.target.value)}
+              className="pointer-events-none absolute h-px w-px opacity-0"
+              tabIndex={-1}
+            />
           </div>
-        </div>
 
-        {/* Date, Time and Guests */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <span className="flex h-6 w-6 items-center justify-center rounded-[2px] border border-[#C9A86A]/40 text-xs font-semibold text-[#C9A86A]">
-              2
-            </span>
-            <h3 className="text-sm tracking-[0.2em] text-white uppercase font-semibold">
-              Fecha, Hora y Asistentes
-            </h3>
+          <div className="grid grid-cols-4 gap-2 sm:grid-cols-7">
+            {weekDates.map((weekDate) => {
+              const dateValue = formatDateValue(weekDate);
+              const isSelected = dateValue === date;
+              return (
+                <button
+                  key={dateValue}
+                  type="button"
+                  onClick={() => setDate(dateValue)}
+                  className={`flex min-h-20 flex-col items-center justify-center rounded-[2px] border p-2 transition-all ${
+                    isSelected
+                      ? "border-[#C9A86A] bg-[#C9A86A]/15 text-[#E5C378] shadow-[var(--shadow-glow)]"
+                      : "border-[#C9A86A]/15 bg-[#121212] text-[#D1D1CB] hover:border-[#C9A86A]/40"
+                  }`}
+                >
+                  <span className="text-[10px] tracking-[0.15em] uppercase">
+                    {WEEKDAY_FORMATTER.format(weekDate).replace(".", "")}
+                  </span>
+                  <span className="mt-1 font-display text-2xl">{DAY_FORMATTER.format(weekDate)}</span>
+                </button>
+              );
+            })}
           </div>
+
+          <div className="rounded-[2px] border border-[#C9A86A]/15 bg-[#121212] p-4">
+            <div className="flex items-center gap-2 text-[11px] tracking-[0.2em] text-[#7A7A75] uppercase font-medium">
+              <Clock className="h-3.5 w-3.5 text-[#C9A86A]" strokeWidth={1.5} /> Horarios disponibles
+            </div>
+            <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-7">
+              {TIME_SLOTS.map((slot) => (
+                <button
+                  key={slot}
+                  type="button"
+                  onClick={() => setTime(slot)}
+                  className={`rounded-[2px] border px-2 py-2.5 text-xs transition-all ${
+                    time === slot
+                      ? "border-[#C9A86A] bg-[#C9A86A]/15 text-[#E5C378]"
+                      : "border-[#C9A86A]/15 text-[#D1D1CB] hover:border-[#C9A86A]/40"
+                  }`}
+                >
+                  {slot}
+                </button>
+              ))}
+            </div>
+            <p className="mt-3 text-[11px] text-[#7A7A75]">Atención continua de 18:00 a 03:00.</p>
+          </div>
+
           <div className="grid gap-4 sm:grid-cols-3">
-            <label className="flex flex-col gap-2 rounded-[2px] border border-[#C9A86A]/15 bg-[#121212] p-4">
-              <span className="flex items-center gap-2 text-[11px] tracking-[0.2em] text-[#7A7A75] uppercase font-medium">
-                <Calendar className="h-3.5 w-3.5 text-[#C9A86A]" strokeWidth={1.5} /> Fecha
-              </span>
-              <input
-                type="date"
-                value={date}
-                required
-                onChange={(e) => setDate(e.target.value)}
-                className="w-full bg-transparent text-sm text-[#D1D1CB] outline-none focus:text-[#C9A86A]"
-              />
-            </label>
-
-            <label className="flex flex-col gap-2 rounded-[2px] border border-[#C9A86A]/15 bg-[#121212] p-4">
-              <span className="flex items-center gap-2 text-[11px] tracking-[0.2em] text-[#7A7A75] uppercase font-medium">
-                <Clock className="h-3.5 w-3.5 text-[#C9A86A]" strokeWidth={1.5} /> Hora aproximada
-              </span>
-              <select
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-                className="w-full bg-[#121212] text-sm text-[#D1D1CB] outline-none focus:text-[#C9A86A]"
-              >
-                {shift === "gastro" ? (
-                  <>
-                    <option value="19:00">19:00</option>
-                    <option value="19:30">19:30</option>
-                    <option value="20:00">20:00</option>
-                    <option value="20:30">20:30</option>
-                    <option value="21:00">21:00</option>
-                  </>
-                ) : (
-                  <>
-                    <option value="22:30">22:30</option>
-                    <option value="23:00">23:00</option>
-                    <option value="23:30">23:30</option>
-                    <option value="00:00">00:00</option>
-                    <option value="00:30">00:30</option>
-                    <option value="01:00">01:00</option>
-                  </>
-                )}
-              </select>
-            </label>
-
-            <label className="flex flex-col gap-2 rounded-[2px] border border-[#C9A86A]/15 bg-[#121212] p-4">
+            <div className="hidden sm:block" />
+            <label className="flex flex-col gap-2 rounded-[2px] border border-[#C9A86A]/15 bg-[#121212] p-4 sm:col-start-3">
               <span className="flex items-center gap-2 text-[11px] tracking-[0.2em] text-[#7A7A75] uppercase font-medium">
                 <Users className="h-3.5 w-3.5 text-[#C9A86A]" strokeWidth={1.5} /> Personas
               </span>
@@ -442,7 +475,7 @@ export function ReservationWizard() {
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <span className="flex h-6 w-6 items-center justify-center rounded-[2px] border border-[#C9A86A]/40 text-xs font-semibold text-[#C9A86A]">
-              3
+              2
             </span>
             <h3 className="text-sm tracking-[0.2em] text-white uppercase font-semibold">
               Selecciona tu Territorio
@@ -474,7 +507,7 @@ export function ReservationWizard() {
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <span className="flex h-6 w-6 items-center justify-center rounded-[2px] border border-[#C9A86A]/40 text-xs font-semibold text-[#C9A86A]">
-              4
+              3
             </span>
             <h3 className="text-sm tracking-[0.2em] text-white uppercase font-semibold">
               Datos del Titular

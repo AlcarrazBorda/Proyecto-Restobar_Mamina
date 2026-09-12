@@ -195,10 +195,69 @@ const CATEGORIES = [
   { id: "cava", label: "Cava y Destilados" },
 ];
 
+function MenuShowcase({ item }: { item: MenuItem }) {
+  return (
+    <div className="sticky top-28">
+      <Reveal delay={50}>
+        <div className="luxury-card overflow-hidden border border-[#C9A86A]/20 bg-[#121212]">
+          <div className="relative aspect-4/3 overflow-hidden">
+            <img src={item.img} alt={item.name} className="h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-transparent to-transparent" />
+            {item.badge && (
+              <span className="absolute top-4 left-4 rounded-[1px] border border-[#C9A86A]/40 bg-[#080808]/90 px-3 py-1 text-[10px] tracking-[0.2em] text-[#C9A86A] uppercase font-semibold backdrop-blur-md">
+                {item.badge}
+              </span>
+            )}
+          </div>
+
+          <div className="p-8 pt-4">
+            <div className="flex items-baseline justify-between">
+              <h3 className="text-white text-2xl font-display">{item.name}</h3>
+              <span className="text-sm font-semibold tracking-widest text-[#E5C378]">
+                {item.price}
+              </span>
+            </div>
+
+            <p className="mt-1 text-xs text-[#E5C378] italic font-editorial">{item.subtitle}</p>
+            <div className="gold-rule my-4 opacity-40" />
+
+            <div className="space-y-2 text-xs leading-[1.6] text-[#D1D1CB]/80 font-light">
+              <p>
+                <strong className="text-[#C9A86A] uppercase tracking-[0.2em] text-[10px] block font-semibold not-italic">
+                  Perfil de Sabor:
+                </strong>{" "}
+                {item.notes}
+              </p>
+              {item.pairing && (
+                <p className="pt-2 text-[#E5C378] italic font-editorial text-sm">
+                  <strong className="tracking-[0.2em] text-[10px] uppercase not-italic text-[#C9A86A] block font-semibold font-sans">
+                    Sugerencia de Maridaje:
+                  </strong>{" "}
+                  {item.pairing}
+                </p>
+              )}
+            </div>
+
+            <div className="mt-8 pt-4 border-t border-[#C9A86A]/10 flex items-center justify-between">
+              <Link to="/reservas" className="btn-primary text-[10px] py-2.5 px-6">
+                <span>Degustar en Sala</span>
+                <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.5} />
+              </Link>
+              <span className="text-[10px] tracking-[0.2em] text-[#7A7A75] uppercase">
+                Ayacucho VIP
+              </span>
+            </div>
+          </div>
+        </div>
+      </Reveal>
+    </div>
+  );
+}
+
 function CartaPage() {
   const [selectedCat, setSelectedCat] = useState("todos");
   const [search, setSearch] = useState("");
-  const [activeItem, setActiveItem] = useState<MenuItem>(MENU_ITEMS[0]);
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
 
   const filteredItems = MENU_ITEMS.filter((item) => {
     const matchesCategory = selectedCat === "todos" || item.category === selectedCat;
@@ -272,121 +331,85 @@ function CartaPage() {
             </button>
           </div>
         ) : (
-          <div className="mt-12 grid gap-12 lg:grid-cols-12 lg:items-start">
-            {/* Left: Refined Item List */}
-            <div className="space-y-4 lg:col-span-7">
-              {filteredItems.map((item) => {
-                const isSelected = activeItem.id === item.id;
+          <div className="mt-12 space-y-20">
+            {CATEGORIES.filter((category) => category.id !== "todos")
+              .filter((category) => selectedCat === "todos" || selectedCat === category.id)
+              .map((category) => {
+                const categoryItems = filteredItems.filter((item) => item.category === category.id);
+                const showcaseItem = MENU_ITEMS.find((item) => item.category === category.id);
+                const isExpanded = expandedCategories.includes(category.id);
+                const visibleItems = isExpanded ? categoryItems : categoryItems.slice(0, 3);
+                const isImageLeft = category.id === "brasa";
+
+                if (!showcaseItem || categoryItems.length === 0) return null;
+
                 return (
-                  <div
-                    key={item.id}
-                    onMouseEnter={() => setActiveItem(item)}
-                    onClick={() => setActiveItem(item)}
-                    className={`cursor-pointer border-b border-[#C9A86A]/10 p-6 transition-all duration-300 ${
-                      isSelected
-                        ? "bg-[#121212] border-l-2 border-l-[#C9A86A] pl-7 shadow-[0_4px_25px_rgba(0,0,0,0.8)]"
-                        : "bg-transparent hover:bg-[#121212]/40"
-                    }`}
-                  >
-                    <div className="flex items-baseline justify-between gap-4">
-                      <div className="flex items-center gap-3">
-                        <h3
-                          className={`font-display text-xl transition-colors ${
-                            isSelected ? "text-[#E5C378]" : "text-white"
-                          }`}
-                        >
-                          {item.name}
-                        </h3>
-                        {item.badge && (
-                          <span className="rounded-[1px] border border-[#C9A86A]/30 bg-[#080808] px-2 py-0.5 text-[9px] tracking-[0.2em] text-[#C9A86A] uppercase font-semibold">
-                            {item.badge}
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-xs font-semibold tracking-widest text-[#C9A86A]">
-                        {item.price}
-                      </span>
-                    </div>
-
-                    <p className="mt-2 text-xs text-[#D1D1CB]/70 font-light leading-[1.6]">
-                      {item.ingredients}
-                    </p>
-
-                    <div className="mt-3 flex items-center justify-between text-[10px] text-[#7A7A75] tracking-wider uppercase">
-                      <span>{item.subtitle}</span>
-                      {item.pairing && (
-                        <span className="text-[#E5C378] italic font-editorial lowercase first-letter:uppercase">
-                          Maridaje: {item.pairing}
+                  <section key={category.id} className="grid gap-12 lg:grid-cols-12 lg:items-start">
+                    <div className={`space-y-4 lg:col-span-7 ${isImageLeft ? "lg:order-2" : ""}`}>
+                      <div className="flex items-end justify-between gap-4 px-6">
+                        <div>
+                          <p className="eyebrow">Selección Mamina</p>
+                          <h2 className="mt-2 font-display text-2xl text-white">
+                            {category.label}
+                          </h2>
+                        </div>
+                        <span className="text-[10px] tracking-[0.2em] text-[#7A7A75] uppercase">
+                          {categoryItems.length} creaciones
                         </span>
-                      )}
+                      </div>
+
+                      {visibleItems.map((item) => (
+                        <div
+                          key={item.id}
+                          className="border-b border-[#C9A86A]/10 p-6 transition-colors hover:bg-[#121212]/40"
+                        >
+                          <div className="flex items-baseline justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                              <h3 className="font-display text-xl text-white">{item.name}</h3>
+                              {item.badge && (
+                                <span className="rounded-[1px] border border-[#C9A86A]/30 bg-[#080808] px-2 py-0.5 text-[9px] tracking-[0.2em] text-[#C9A86A] uppercase font-semibold">
+                                  {item.badge}
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-xs font-semibold tracking-widest text-[#C9A86A]">
+                              {item.price}
+                            </span>
+                          </div>
+                          <p className="mt-2 text-xs text-[#D1D1CB]/70 font-light leading-[1.6]">
+                            {item.ingredients}
+                          </p>
+                          <div className="mt-3 text-[10px] text-[#7A7A75] tracking-wider uppercase">
+                            {item.subtitle}
+                          </div>
+                        </div>
+                      ))}
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setExpandedCategories((current) =>
+                            isExpanded
+                              ? current.filter((id) => id !== category.id)
+                              : [...current, category.id],
+                          )
+                        }
+                        className="btn-secondary mt-2 ml-6"
+                      >
+                        <span>{isExpanded ? "Ver menos" : "Ver más"}</span>
+                        <ArrowRight
+                          className={`h-3.5 w-3.5 transition-transform ${isExpanded ? "rotate-[-90deg]" : ""}`}
+                          strokeWidth={1.5}
+                        />
+                      </button>
                     </div>
-                  </div>
+
+                    <div className={`lg:col-span-5 ${isImageLeft ? "lg:order-1" : ""}`}>
+                      <MenuShowcase item={showcaseItem} />
+                    </div>
+                  </section>
                 );
               })}
-            </div>
-
-            {/* Right: Dynamic High-Res Showcase Card */}
-            <div className="sticky top-28 lg:col-span-5">
-              <Reveal key={activeItem.id} delay={50}>
-                <div className="luxury-card overflow-hidden border border-[#C9A86A]/20 bg-[#121212]">
-                  <div className="relative aspect-4/3 overflow-hidden">
-                    <img
-                      src={activeItem.img}
-                      alt={activeItem.name}
-                      className="h-full w-full object-cover transition-transform duration-[1200ms] ease-out hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-transparent to-transparent" />
-                    {activeItem.badge && (
-                      <span className="absolute top-4 left-4 rounded-[1px] border border-[#C9A86A]/40 bg-[#080808]/90 px-3 py-1 text-[10px] tracking-[0.2em] text-[#C9A86A] uppercase font-semibold backdrop-blur-md">
-                        {activeItem.badge}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="p-8 pt-4">
-                    <div className="flex items-baseline justify-between">
-                      <h3 className="text-white text-2xl font-display">{activeItem.name}</h3>
-                      <span className="text-sm font-semibold tracking-widest text-[#E5C378]">
-                        {activeItem.price}
-                      </span>
-                    </div>
-
-                    <p className="mt-1 text-xs text-[#E5C378] italic font-editorial">
-                      {activeItem.subtitle}
-                    </p>
-
-                    <div className="gold-rule my-4 opacity-40" />
-
-                    <div className="space-y-2 text-xs leading-[1.6] text-[#D1D1CB]/80 font-light">
-                      <p>
-                        <strong className="text-[#C9A86A] uppercase tracking-[0.2em] text-[10px] block font-semibold not-italic">
-                          Perfil de Sabor:
-                        </strong>{" "}
-                        {activeItem.notes}
-                      </p>
-                      {activeItem.pairing && (
-                        <p className="pt-2 text-[#E5C378] italic font-editorial text-sm">
-                          <strong className="tracking-[0.2em] text-[10px] uppercase not-italic text-[#C9A86A] block font-semibold font-sans">
-                            Sugerencia de Maridaje:
-                          </strong>{" "}
-                          {activeItem.pairing}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="mt-8 pt-4 border-t border-[#C9A86A]/10 flex items-center justify-between">
-                      <Link to="/reservas" className="btn-primary text-[10px] py-2.5 px-6">
-                        <span>Degustar en Sala</span>
-                        <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.5} />
-                      </Link>
-                      <span className="text-[10px] tracking-[0.2em] text-[#7A7A75] uppercase">
-                        Ayacucho VIP
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </Reveal>
-            </div>
           </div>
         )}
 

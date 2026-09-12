@@ -62,11 +62,6 @@ export function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/el-concepto" className="transition-colors hover:text-[#C9A86A]">
-                    El Concepto
-                  </Link>
-                </li>
-                <li>
                   <Link to="/galeria" className="transition-colors hover:text-[#C9A86A]">
                     The Vibe Galería
                   </Link>

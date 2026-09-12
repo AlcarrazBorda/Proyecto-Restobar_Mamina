@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Hero } from "@/components/mamina/Hero";
-import { ConceptSection } from "@/components/mamina/ConceptSection";
 import { Menu } from "@/components/mamina/Menu";
 import { Zones } from "@/components/mamina/Zones";
 import { Agenda } from "@/components/mamina/Agenda";
@@ -32,7 +31,6 @@ function Index() {
   return (
     <div className="bg-[#080808]">
       <Hero />
-      <ConceptSection />
       <Menu />
       <Zones />
       <Agenda />

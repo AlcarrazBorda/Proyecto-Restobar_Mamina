@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AgendaRouteImport } from './routes/agenda'
 import { Route as CartaRouteImport } from './routes/carta'
-import { Route as ElConceptoRouteImport } from './routes/el-concepto'
 import { Route as ExperienciasRouteImport } from './routes/experiencias'
 import { Route as GaleriaRouteImport } from './routes/galeria'
 import { Route as ReservasRouteImport } from './routes/reservas'
@@ -30,11 +29,6 @@ const AgendaRoute = AgendaRouteImport.update({
 const CartaRoute = CartaRouteImport.update({
   id: '/carta',
   path: '/carta',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ElConceptoRoute = ElConceptoRouteImport.update({
-  id: '/el-concepto',
-  path: '/el-concepto',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExperienciasRoute = ExperienciasRouteImport.update({
@@ -57,7 +51,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/agenda': typeof AgendaRoute
   '/carta': typeof CartaRoute
-  '/el-concepto': typeof ElConceptoRoute
   '/experiencias': typeof ExperienciasRoute
   '/galeria': typeof GaleriaRoute
   '/reservas': typeof ReservasRoute
@@ -66,7 +59,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/agenda': typeof AgendaRoute
   '/carta': typeof CartaRoute
-  '/el-concepto': typeof ElConceptoRoute
   '/experiencias': typeof ExperienciasRoute
   '/galeria': typeof GaleriaRoute
   '/reservas': typeof ReservasRoute
@@ -76,7 +68,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/agenda': typeof AgendaRoute
   '/carta': typeof CartaRoute
-  '/el-concepto': typeof ElConceptoRoute
   '/experiencias': typeof ExperienciasRoute
   '/galeria': typeof GaleriaRoute
   '/reservas': typeof ReservasRoute
@@ -84,28 +75,14 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
-    | '/agenda'
-    | '/carta'
-    | '/el-concepto'
-    | '/experiencias'
-    | '/galeria'
-    | '/reservas'
+    '/' | '/agenda' | '/carta' | '/experiencias' | '/galeria' | '/reservas'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/agenda'
-    | '/carta'
-    | '/el-concepto'
-    | '/experiencias'
-    | '/galeria'
-    | '/reservas'
+  to: '/' | '/agenda' | '/carta' | '/experiencias' | '/galeria' | '/reservas'
   id:
     | '__root__'
     | '/'
     | '/agenda'
     | '/carta'
-    | '/el-concepto'
     | '/experiencias'
     | '/galeria'
     | '/reservas'
@@ -115,7 +92,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AgendaRoute: typeof AgendaRoute
   CartaRoute: typeof CartaRoute
-  ElConceptoRoute: typeof ElConceptoRoute
   ExperienciasRoute: typeof ExperienciasRoute
   GaleriaRoute: typeof GaleriaRoute
   ReservasRoute: typeof ReservasRoute
@@ -142,13 +118,6 @@ declare module '@tanstack/react-router' {
       path: '/carta'
       fullPath: '/carta'
       preLoaderRoute: typeof CartaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/el-concepto': {
-      id: '/el-concepto'
-      path: '/el-concepto'
-      fullPath: '/el-concepto'
-      preLoaderRoute: typeof ElConceptoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/experiencias': {
@@ -179,7 +148,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AgendaRoute: AgendaRoute,
   CartaRoute: CartaRoute,
-  ElConceptoRoute: ElConceptoRoute,
   ExperienciasRoute: ExperienciasRoute,
   GaleriaRoute: GaleriaRoute,
   ReservasRoute: ReservasRoute,
